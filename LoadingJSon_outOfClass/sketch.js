@@ -8,9 +8,9 @@ function setup() {
 }
 
 function showData(data) {
-    fill(data.green);
+    fill(data.red);
     textSize(150);
-    text(data.green, width/2, height/2);
+    text(data.red, width/2, height/2);
 }
 
    	console.log("hello world ?????????");
