@@ -10,7 +10,7 @@ function setup() {
 function showData(data) {
     fill(data.green);
     textSize(150);
-    text(data.yellow, width/2, height/2);
+    text(data.green, width/2, height/2);
 }
 
-   	console.log("wow hi lol");
+   	console.log("hi it's working");
