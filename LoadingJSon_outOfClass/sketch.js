@@ -9,8 +9,8 @@ function setup() {
 
 function showData(data) {
     fill(data.green);
-    textSize(300);
+    textSize(150);
     text(data.yellow, width/2, height/2);
 }
 
-   	console.log("seriously wtf WORLD");
+   	console.log("wow hi lol");
