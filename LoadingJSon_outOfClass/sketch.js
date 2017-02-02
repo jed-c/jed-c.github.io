@@ -9,10 +9,10 @@ function setup() {
 
 
 function showData(data) {
-    fill(data.black);
+    fill(data.green);
     textSize(150);
-    text(data.black, width/2, height/2);
+    text(data.green, width/2, height/2);
 }
 
 
-   	console.log("waiting on a change");
+   	console.log("learning my lessons with hard reload");
