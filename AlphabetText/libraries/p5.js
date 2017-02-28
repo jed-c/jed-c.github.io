@@ -1,4 +1,4 @@
-/*! p5.js v0.5.7 February 08, 2017 */
+/*! p5.js v0.5.6 January 03, 2017 */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.p5 = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 
 },{}],2:[function(_dereq_,module,exports){
@@ -8839,10 +8839,7 @@ var p5 = function(sketch, node, sync) {
    * asynchronous loading of external files. If a preload function is
    * defined, setup() will wait until any load calls within have finished.
    * Nothing besides load calls should be inside preload (loadImage,
-   * loadJSON, loadFont, loadStrings, etc).<br><br>
-   * By default the text "loading..." will be displayed. To make your own
-   * loading page, include an HTML element with id "p5_loading" in your
-   * page. More information <a href="http://bit.ly/2kQ6Nio">here</a>.
+   * loadJSON, loadFont, loadStrings, etc).
    *
    * @method preload
    * @example
@@ -10119,8 +10116,7 @@ p5.prototype.cursor = function(type, x, y) {
       // https://developer.mozilla.org/en-US/docs/Web/CSS/cursor
       coords = x + ' ' + y;
     }
-    if ((type.substring(0, 7) === 'http://') ||
-        (type.substring(0, 8) === 'https://')) {
+    if (type.substring(0, 6) !== 'http://') {
       // Image (absolute url)
       cursor = 'url(' + type + ') ' + coords + ', auto';
     } else if (/\.(cur|jpg|jpeg|gif|png|CUR|JPG|JPEG|GIF|PNG)$/.test(type)) {
@@ -11837,15 +11833,6 @@ p5.Graphics = function(w, h, renderer, pInst) {
 };
 
 p5.Graphics.prototype = Object.create(p5.Element.prototype);
-
-p5.Graphics.prototype.remove = function() {
-  if (this.elt.parentNode) {
-    this.elt.parentNode.removeChild(this.elt);
-  }
-  for (var elt_ev in this._events) {
-    this.elt.removeEventListener(elt_ev, this._events[elt_ev]);
-  }
-};
 
 module.exports = p5.Graphics;
 
@@ -15978,16 +15965,12 @@ p5.prototype._onkeydown = function (e) {
  */
 p5.prototype._onkeyup = function (e) {
   var keyReleased = this.keyReleased || window.keyReleased;
+  this._setProperty('isKeyPressed', false);
+  this._setProperty('keyIsPressed', false);
+  this._setProperty('_lastKeyCodeTyped', null);
   downKeys[e.which] = false;
   //delete this._downKeys[e.which];
   var key = String.fromCharCode(e.which);
-
-  if(areDownKeys()) {
-    this._setProperty('isKeyPressed', false);
-    this._setProperty('keyIsPressed', false);
-  }
-
-  this._setProperty('_lastKeyCodeTyped', null);
   if (!key) {
     key = e.which;
   }
@@ -16110,24 +16093,6 @@ p5.prototype._onblur = function (e) {
 p5.prototype.keyIsDown = function(code) {
   return downKeys[code];
 };
-
-/**
- * The checkDownKeys function returns a boolean true if any keys pressed
- * and a false if no keys are currently pressed.
-
- * Helps avoid instances where a multiple keys are pressed simultaneously and
- * releasing a single key will then switch the
- * keyIsPressed property to true.
- * @private
-**/
-function areDownKeys() {
-  for (var key in downKeys) {
-    if (downKeys[key] === true ) {
-      return true;
-    }
-  }
-  return false;
-}
 
 module.exports = p5;
 
@@ -16430,24 +16395,24 @@ p5.prototype.pwinMouseY = 0;
  * @property mouseButton
  *
  * @example
-	* <div>
-	* <code>
-	* function draw() {
-	*   background(237, 34, 93);
-	*   fill(0);
-	*
-	*   if (mouseIsPressed) {
-	*     if (mouseButton == LEFT)
-	*       ellipse(50, 50, 50, 50);
-	*     if (mouseButton == RIGHT)
-	*       rect(25, 25, 50, 50);
-	*     if (mouseButton == CENTER)
-	*       triangle(23, 75, 50, 20, 78, 75);
-	*   }
-	*
-	*   print(mouseButton);
-	* }
-	* </code>
+    * <div>
+    * <code>
+    * function draw() {
+    *   background(237, 34, 93);
+    *   fill(0);
+    *
+    *   if (mouseIsPressed) {
+    *     if (mouseButton == LEFT)
+    *       ellipse(50, 50, 50, 50);
+    *     if (mouseButton == RIGHT)
+    *       rect(25, 25, 50, 50);
+    *     if (mouseButton == CENTER)
+    *       triangle(23, 75, 50, 20, 78, 75);
+    *   }
+    *
+    *   print(mouseButton);
+    * }
+    * </code>
  * </div>
  *
  * @alt
@@ -16463,21 +16428,21 @@ p5.prototype.mouseButton = 0;
  * @property mouseIsPressed
  *
  * @example
-	* <div>
-	* <code>
-	* function draw() {
-	*   background(237, 34, 93);
-	*   fill(0);
-	*
-	*   if (mouseIsPressed)
-	*     ellipse(50, 50, 50, 50);
-	*   else
-	*     rect(25, 25, 50, 50);
-	*
-	*   print(mouseIsPressed);
-	* }
-	* </code>
-	* </div>
+    * <div>
+    * <code>
+    * function draw() {
+    *   background(237, 34, 93);
+    *   fill(0);
+    *
+    *   if (mouseIsPressed)
+    *     ellipse(50, 50, 50, 50);
+    *   else
+    *     rect(25, 25, 50, 50);
+    *
+    *   print(mouseIsPressed);
+    * }
+    * </code>
+    * </div>
   *
  * @alt
  * black 50x50 rect becomes ellipse with mouse click/press. fuschia background.
@@ -16487,7 +16452,7 @@ p5.prototype.mouseIsPressed = false;
 p5.prototype.isMousePressed = false; // both are supported
 
 p5.prototype._updateNextMouseCoords = function(e) {
-  if(this._curElement !== null && (!e.touches || e.touches.length>0)) {
+  if(this._curElement !== null) {
     var mousePos = getMousePos(this._curElement.elt, this.width, this.height, e);
     this._setProperty('mouseX', mousePos.x);
     this._setProperty('mouseY', mousePos.y);
@@ -17822,7 +17787,7 @@ var frames = [];
  * var pink = color(255, 102, 204);
  * img = createImage(66, 66);
  * img.loadPixels();
- * var d = pixelDensity();
+ * var d = pixelDensity;
  * var halfImage = 4 * (width * d) * (height/2 * d);
  * for (var i = 0; i < halfImage; i+=4) {
  *   img.pixels[i] = red(pink);
@@ -18250,7 +18215,7 @@ function _sAssign(sVal, iVal) {
 /**
  * @method image
  * @param  {p5.Image} img
- * @param  {Number}   dx     the x-coordinate in the destination canvas at
+ * @param  {Number}   dx     the -xcoordinate in the destination canvas at
  *                           which to place the top-left corner of the
  *                           source image
  * @param  {Number}   dy     the y-coordinate in the destination canvas at
@@ -19012,7 +18977,7 @@ p5.Image.prototype.copy = function () {
 
 /**
  * Masks part of an image from displaying by loading another
- * image and using it's alpha channel as an alpha channel for
+ * image and using it's blue channel as an alpha channel for
  * this image.
  *
  * @method mask
@@ -21288,11 +21253,7 @@ p5.prototype.downloadFile = function (href, fName, extension) {
   a.download = filename;
 
   // Firefox requires the link to be added to the DOM before click()
-  a.onclick = function(e) {
-    destroyClickedElement(e);
-    e.stopPropagation();
-  };
-
+  a.onclick = destroyClickedElement;
   a.style.display = 'none';
   document.body.appendChild(a);
 
@@ -21438,39 +21399,39 @@ p5.Table = function (rows) {
  *  @param   {p5.TableRow} [row] row to be added to the table
  *
  * @example
-	* <div class="norender">
-	* <code>
-	* // Given the CSV file "mammals.csv"
-	* // in the project's "assets" folder:
-	* //
-	* // id,species,name
-	* // 0,Capra hircus,Goat
-	* // 1,Panthera pardus,Leopard
-	* // 2,Equus zebra,Zebra
-	*
-	* var table;
-	*
-	* function preload() {
-	*   //my table is comma separated value "csv"
-	*   //and has a header specifying the columns labels
-	*   table = loadTable("assets/mammals.csv", "csv", "header");
-	* }
-	*
-	* function setup() {
-	*   //add a row
-	*   var newRow = table.addRow();
-	*   newRow.setString("id", table.getRowCount() - 1);
-	*   newRow.setString("species", "Canis Lupus");
-	*   newRow.setString("name", "Wolf");
-	*
-	*   //print the results
-	*   for (var r = 0; r < table.getRowCount(); r++)
-	*     for (var c = 0; c < table.getColumnCount(); c++)
-	*       print(table.getString(r, c));
-	* }
-	* </code>
-	* </div>
-	*
+    * <div class="norender">
+    * <code>
+    * // Given the CSV file "mammals.csv"
+    * // in the project's "assets" folder:
+    * //
+    * // id,species,name
+    * // 0,Capra hircus,Goat
+    * // 1,Panthera pardus,Leopard
+    * // 2,Equus zebra,Zebra
+    *
+    * var table;
+    *
+    * function preload() {
+    *   //my table is comma separated value "csv"
+    *   //and has a header specifying the columns labels
+    *   table = loadTable("assets/mammals.csv", "csv", "header");
+    * }
+    *
+    * function setup() {
+    *   //add a row
+    *   var newRow = table.addRow();
+    *   newRow.setString("id", table.getRowCount() - 1);
+    *   newRow.setString("species", "Canis Lupus");
+    *   newRow.setString("name", "Wolf");
+    *
+    *   //print the results
+    *   for (var r = 0; r < table.getRowCount(); r++)
+    *     for (var c = 0; c < table.getColumnCount(); c++)
+    *       print(table.getString(r, c));
+    * }
+    * </code>
+    * </div>
+    *
  * @alt
  * no image displayed
  *
@@ -21495,39 +21456,39 @@ p5.Table.prototype.addRow = function(row) {
  * @param   {Number} id ID number of the row to remove
  *
  * @example
-	* <div class="norender">
-	* <code>
-	* // Given the CSV file "mammals.csv"
-	* // in the project's "assets" folder:
-	* //
-	* // id,species,name
-	* // 0,Capra hircus,Goat
-	* // 1,Panthera pardus,Leopard
-	* // 2,Equus zebra,Zebra
-	*
-	* var table;
-	*
-	* function preload() {
-	*   //my table is comma separated value "csv"
-	*   //and has a header specifying the columns labels
-	*   table = loadTable("assets/mammals.csv", "csv", "header");
-	* }
-	*
-	* function setup() {
-	*   //remove the first row
-	*   var r = table.removeRow(0);
-	*
-	*   //print the results
-	*   for (var r = 0; r < table.getRowCount(); r++)
-	*     for (var c = 0; c < table.getColumnCount(); c++)
-	*       print(table.getString(r, c));
-	* }
-	* </code>
-	* </div>
-	*
+    * <div class="norender">
+    * <code>
+    * // Given the CSV file "mammals.csv"
+    * // in the project's "assets" folder:
+    * //
+    * // id,species,name
+    * // 0,Capra hircus,Goat
+    * // 1,Panthera pardus,Leopard
+    * // 2,Equus zebra,Zebra
+    *
+    * var table;
+    *
+    * function preload() {
+    *   //my table is comma separated value "csv"
+    *   //and has a header specifying the columns labels
+    *   table = loadTable("assets/mammals.csv", "csv", "header");
+    * }
+    *
+    * function setup() {
+    *   //remove the first row
+    *   var r = table.removeRow(0);
+    *
+    *   //print the results
+    *   for (var r = 0; r < table.getRowCount(); r++)
+    *     for (var c = 0; c < table.getColumnCount(); c++)
+    *       print(table.getString(r, c));
+    * }
+    * </code>
+    * </div>
+    *
     * @alt
- 	* no image displayed
- 	*
+    * no image displayed
+    *
  */
 p5.Table.prototype.removeRow = function(id) {
   this.rows[id].table = null; // remove reference to table
@@ -21546,37 +21507,37 @@ p5.Table.prototype.removeRow = function(id) {
  * @return {TableRow} p5.TableRow object
  *
  * @example
-	* <div class="norender">
-	* <code>
-	* // Given the CSV file "mammals.csv"
-	* // in the project's "assets" folder:
-	* //
-	* // id,species,name
-	* // 0,Capra hircus,Goat
-	* // 1,Panthera pardus,Leopard
-	* // 2,Equus zebra,Zebra
-	*
-	* var table;
-	*
-	* function preload() {
-	*   //my table is comma separated value "csv"
-	*   //and has a header specifying the columns labels
-	*   table = loadTable("assets/mammals.csv", "csv", "header");
-	* }
-	*
-	* function setup() {
-	*   var row = table.getRow(1);
-	*   //print it column by column
-	*   //note: a row is an object, not an array
-	*   for (var c = 0; c < table.getColumnCount(); c++)
-	*     print(row.getString(c));
-	* }
-	* </code>
-	* </div>
-	*
- 	*@alt
- 	* no image displayed
- 	*
+    * <div class="norender">
+    * <code>
+    * // Given the CSV file "mammals.csv"
+    * // in the project's "assets" folder:
+    * //
+    * // id,species,name
+    * // 0,Capra hircus,Goat
+    * // 1,Panthera pardus,Leopard
+    * // 2,Equus zebra,Zebra
+    *
+    * var table;
+    *
+    * function preload() {
+    *   //my table is comma separated value "csv"
+    *   //and has a header specifying the columns labels
+    *   table = loadTable("assets/mammals.csv", "csv", "header");
+    * }
+    *
+    * function setup() {
+    *   var row = table.getRow(1);
+    *   //print it column by column
+    *   //note: a row is an object, not an array
+    *   for (var c = 0; c < table.getColumnCount(); c++)
+    *     print(row.getString(c));
+    * }
+    * </code>
+    * </div>
+    *
+    *@alt
+    * no image displayed
+    *
  */
 p5.Table.prototype.getRow = function(r) {
   return this.rows[r];
@@ -21589,39 +21550,39 @@ p5.Table.prototype.getRow = function(r) {
  *  @return {Array}   Array of p5.TableRows
  *
  * @example
-	* <div class="norender">
-	* <code>
-	* // Given the CSV file "mammals.csv"
-	* // in the project's "assets" folder:
-	* //
-	* // id,species,name
-	* // 0,Capra hircus,Goat
-	* // 1,Panthera pardus,Leopard
-	* // 2,Equus zebra,Zebra
-	*
-	* var table;
-	*
-	* function preload() {
-	*   //my table is comma separated value "csv"
-	*   //and has a header specifying the columns labels
-	*   table = loadTable("assets/mammals.csv", "csv", "header");
-	* }
-	*
-	* function setup() {
-	*   var rows = table.getRows();
-	*
-	*   //warning: rows is an array of objects
-	*   for (var r = 0; r < rows.length; r++)
-	*     rows[r].set("name", "Unicorn");
-	*
-	*   //print the results
-	*   for (var r = 0; r < table.getRowCount(); r++)
-	*     for (var c = 0; c < table.getColumnCount(); c++)
-	*       print(table.getString(r, c));
-	* }
-	* </code>
-	* </div>
-	*
+    * <div class="norender">
+    * <code>
+    * // Given the CSV file "mammals.csv"
+    * // in the project's "assets" folder:
+    * //
+    * // id,species,name
+    * // 0,Capra hircus,Goat
+    * // 1,Panthera pardus,Leopard
+    * // 2,Equus zebra,Zebra
+    *
+    * var table;
+    *
+    * function preload() {
+    *   //my table is comma separated value "csv"
+    *   //and has a header specifying the columns labels
+    *   table = loadTable("assets/mammals.csv", "csv", "header");
+    * }
+    *
+    * function setup() {
+    *   var rows = table.getRows();
+    *
+    *   //warning: rows is an array of objects
+    *   for (var r = 0; r < rows.length; r++)
+    *     rows[r].set("name", "Unicorn");
+    *
+    *   //print the results
+    *   for (var r = 0; r < table.getRowCount(); r++)
+    *     for (var c = 0; c < table.getColumnCount(); c++)
+    *       print(table.getString(r, c));
+    * }
+    * </code>
+    * </div>
+    *
     * @alt
     * no image displayed
     *
@@ -21644,33 +21605,33 @@ p5.Table.prototype.getRows = function() {
  *  @return {TableRow}
  *
  * @example
-	* <div class="norender">
-	* <code>
-	* // Given the CSV file "mammals.csv"
-	* // in the project's "assets" folder:
-	* //
-	* // id,species,name
-	* // 0,Capra hircus,Goat
-	* // 1,Panthera pardus,Leopard
-	* // 2,Equus zebra,Zebra
-	*
-	* var table;
-	*
-	* function preload() {
-	*   //my table is comma separated value "csv"
-	*   //and has a header specifying the columns labels
-	*   table = loadTable("assets/mammals.csv", "csv", "header");
-	* }
-	*
-	* function setup() {
-	*   //find the animal named zebra
-	*   var row = table.findRow("Zebra", "name");
-	*   //find the corresponding species
-	*   print(row.getString("species"));
-	* }
-	* </code>
-	* </div>
-	*
+    * <div class="norender">
+    * <code>
+    * // Given the CSV file "mammals.csv"
+    * // in the project's "assets" folder:
+    * //
+    * // id,species,name
+    * // 0,Capra hircus,Goat
+    * // 1,Panthera pardus,Leopard
+    * // 2,Equus zebra,Zebra
+    *
+    * var table;
+    *
+    * function preload() {
+    *   //my table is comma separated value "csv"
+    *   //and has a header specifying the columns labels
+    *   table = loadTable("assets/mammals.csv", "csv", "header");
+    * }
+    *
+    * function setup() {
+    *   //find the animal named zebra
+    *   var row = table.findRow("Zebra", "name");
+    *   //find the corresponding species
+    *   print(row.getString("species"));
+    * }
+    * </code>
+    * </div>
+    *
  * @alt
  * no image displayed
  *
@@ -21710,41 +21671,41 @@ p5.Table.prototype.findRow = function(value, column) {
  *  @return {Array}        An Array of TableRow objects
  *
  * @example
-	* <div class="norender">
-	* <code>
-	* // Given the CSV file "mammals.csv"
-	* // in the project's "assets" folder:
-	* //
-	* // id,species,name
-	* // 0,Capra hircus,Goat
-	* // 1,Panthera pardus,Leopard
-	* // 2,Equus zebra,Zebra
-	*
-	* var table;
-	*
-	* function preload() {
-	*   //my table is comma separated value "csv"
-	*   //and has a header specifying the columns labels
-	*   table = loadTable("assets/mammals.csv", "csv", "header");
-	* }
-	*
-	* function setup() {
-	*   //add another goat
-	*   var newRow = table.addRow();
-	*   newRow.setString("id", table.getRowCount() - 1);
-	*   newRow.setString("species", "Scape Goat");
-	*   newRow.setString("name", "Goat");
-	*
-	*   //find the rows containing animals named Goat
-	*   var rows = table.findRows("Goat", "name");
-	*   print(rows.length + " Goats found");
-	* }
-	* </code>
-	* </div>
-	*
- 	*@alt
- 	* no image displayed
- 	*
+    * <div class="norender">
+    * <code>
+    * // Given the CSV file "mammals.csv"
+    * // in the project's "assets" folder:
+    * //
+    * // id,species,name
+    * // 0,Capra hircus,Goat
+    * // 1,Panthera pardus,Leopard
+    * // 2,Equus zebra,Zebra
+    *
+    * var table;
+    *
+    * function preload() {
+    *   //my table is comma separated value "csv"
+    *   //and has a header specifying the columns labels
+    *   table = loadTable("assets/mammals.csv", "csv", "header");
+    * }
+    *
+    * function setup() {
+    *   //add another goat
+    *   var newRow = table.addRow();
+    *   newRow.setString("id", table.getRowCount() - 1);
+    *   newRow.setString("species", "Scape Goat");
+    *   newRow.setString("name", "Goat");
+    *
+    *   //find the rows containing animals named Goat
+    *   var rows = table.findRows("Goat", "name");
+    *   print(rows.length + " Goats found");
+    * }
+    * </code>
+    * </div>
+    *
+    *@alt
+    * no image displayed
+    *
  */
 p5.Table.prototype.findRows = function(value, column) {
   var ret = [];
@@ -21874,35 +21835,35 @@ p5.Table.prototype.matchRows = function(regexp, column) {
  *  @return {Array}       Array of column values
  *
  * @example
-	* <div class="norender">
-	* <code>
-	* // Given the CSV file "mammals.csv"
-	* // in the project's "assets" folder:
-	* //
-	* // id,species,name
-	* // 0,Capra hircus,Goat
-	* // 1,Panthera pardus,Leopard
-	* // 2,Equus zebra,Zebra
-	*
-	* var table;
-	*
-	* function preload() {
-	*   //my table is comma separated value "csv"
-	*   //and has a header specifying the columns labels
-	*   table = loadTable("assets/mammals.csv", "csv", "header");
-	* }
-	*
-	* function setup() {
-	*   //getColumn returns an array that can be printed directly
-	*   print(table.getColumn("species"));
-	*   //outputs ["Capra hircus", "Panthera pardus", "Equus zebra"]
-	* }
-	* </code>
-	* </div>
-	*
- 	*@alt
- 	* no image displayed
- 	*
+    * <div class="norender">
+    * <code>
+    * // Given the CSV file "mammals.csv"
+    * // in the project's "assets" folder:
+    * //
+    * // id,species,name
+    * // 0,Capra hircus,Goat
+    * // 1,Panthera pardus,Leopard
+    * // 2,Equus zebra,Zebra
+    *
+    * var table;
+    *
+    * function preload() {
+    *   //my table is comma separated value "csv"
+    *   //and has a header specifying the columns labels
+    *   table = loadTable("assets/mammals.csv", "csv", "header");
+    * }
+    *
+    * function setup() {
+    *   //getColumn returns an array that can be printed directly
+    *   print(table.getColumn("species"));
+    *   //outputs ["Capra hircus", "Panthera pardus", "Equus zebra"]
+    * }
+    * </code>
+    * </div>
+    *
+    *@alt
+    * no image displayed
+    *
  */
 p5.Table.prototype.getColumn = function(value) {
   var ret = [];
@@ -21925,35 +21886,35 @@ p5.Table.prototype.getColumn = function(value) {
  *  @method  clearRows
  *
  * @example
-	* <div class="norender">
-	* <code>
-	* // Given the CSV file "mammals.csv"
-	* // in the project's "assets" folder:
-	* //
-	* // id,species,name
-	* // 0,Capra hircus,Goat
-	* // 1,Panthera pardus,Leopard
-	* // 2,Equus zebra,Zebra
-	*
-	* var table;
-	*
-	* function preload() {
-	*   //my table is comma separated value "csv"
-	*   //and has a header specifying the columns labels
-	*   table = loadTable("assets/mammals.csv", "csv", "header");
-	* }
-	*
-	* function setup() {
-	*   table.clearRows();
-	*   print(table.getRowCount() + " total rows in table");
-	*   print(table.getColumnCount() + " total columns in table");
-	* }
-	* </code>
-	* </div>
-	*
- 	*@alt
- 	* no image displayed
- 	*
+    * <div class="norender">
+    * <code>
+    * // Given the CSV file "mammals.csv"
+    * // in the project's "assets" folder:
+    * //
+    * // id,species,name
+    * // 0,Capra hircus,Goat
+    * // 1,Panthera pardus,Leopard
+    * // 2,Equus zebra,Zebra
+    *
+    * var table;
+    *
+    * function preload() {
+    *   //my table is comma separated value "csv"
+    *   //and has a header specifying the columns labels
+    *   table = loadTable("assets/mammals.csv", "csv", "header");
+    * }
+    *
+    * function setup() {
+    *   table.clearRows();
+    *   print(table.getRowCount() + " total rows in table");
+    *   print(table.getColumnCount() + " total columns in table");
+    * }
+    * </code>
+    * </div>
+    *
+    *@alt
+    * no image displayed
+    *
  */
 p5.Table.prototype.clearRows = function() {
   delete this.rows;
@@ -21970,41 +21931,41 @@ p5.Table.prototype.clearRows = function() {
  *  @param {String} [title] title of the given column
  *
  * @example
-	* <div class="norender">
-	* <code>
-	* // Given the CSV file "mammals.csv"
-	* // in the project's "assets" folder:
-	* //
-	* // id,species,name
-	* // 0,Capra hircus,Goat
-	* // 1,Panthera pardus,Leopard
-	* // 2,Equus zebra,Zebra
-	*
-	* var table;
-	*
-	* function preload() {
-	*   //my table is comma separated value "csv"
-	*   //and has a header specifying the columns labels
-	*   table = loadTable("assets/mammals.csv", "csv", "header");
-	* }
-	*
-	* function setup() {
-	*   table.addColumn("carnivore");
-	*   table.set(0, "carnivore", "no");
-	*   table.set(1, "carnivore", "yes");
-	*   table.set(2, "carnivore", "no");
-	*
-	*   //print the results
-	*   for (var r = 0; r < table.getRowCount(); r++)
-	*     for (var c = 0; c < table.getColumnCount(); c++)
-	*       print(table.getString(r, c));
-	* }
-	* </code>
-	* </div>
-	*
- 	*@alt
- 	* no image displayed
- 	*
+    * <div class="norender">
+    * <code>
+    * // Given the CSV file "mammals.csv"
+    * // in the project's "assets" folder:
+    * //
+    * // id,species,name
+    * // 0,Capra hircus,Goat
+    * // 1,Panthera pardus,Leopard
+    * // 2,Equus zebra,Zebra
+    *
+    * var table;
+    *
+    * function preload() {
+    *   //my table is comma separated value "csv"
+    *   //and has a header specifying the columns labels
+    *   table = loadTable("assets/mammals.csv", "csv", "header");
+    * }
+    *
+    * function setup() {
+    *   table.addColumn("carnivore");
+    *   table.set(0, "carnivore", "no");
+    *   table.set(1, "carnivore", "yes");
+    *   table.set(2, "carnivore", "no");
+    *
+    *   //print the results
+    *   for (var r = 0; r < table.getRowCount(); r++)
+    *     for (var c = 0; c < table.getColumnCount(); c++)
+    *       print(table.getString(r, c));
+    * }
+    * </code>
+    * </div>
+    *
+    *@alt
+    * no image displayed
+    *
  */
 p5.Table.prototype.addColumn = function(title) {
   var t = title || null;
@@ -22135,34 +22096,34 @@ p5.Table.prototype.trim = function(column) {
  *  @param  {String|Number} column columnName (string) or ID (number)
  *
  * @example
-	* <div class="norender">
-	* <code>
-	* // Given the CSV file "mammals.csv"
-	* // in the project's "assets" folder:
-	* //
-	* // id,species,name
-	* // 0,Capra hircus,Goat
-	* // 1,Panthera pardus,Leopard
-	* // 2,Equus zebra,Zebra
-	*
-	* var table;
-	*
-	* function preload() {
-	*   //my table is comma separated value "csv"
-	*   //and has a header specifying the columns labels
-	*   table = loadTable("assets/mammals.csv", "csv", "header");
-	* }
-	*
-	* function setup() {
-	*   table.removeColumn("id");
-	*   print(table.getColumnCount());
-	* }
-	* </code>
-	* </div>
-	*
- 	*@alt
- 	* no image displayed
- 	*
+    * <div class="norender">
+    * <code>
+    * // Given the CSV file "mammals.csv"
+    * // in the project's "assets" folder:
+    * //
+    * // id,species,name
+    * // 0,Capra hircus,Goat
+    * // 1,Panthera pardus,Leopard
+    * // 2,Equus zebra,Zebra
+    *
+    * var table;
+    *
+    * function preload() {
+    *   //my table is comma separated value "csv"
+    *   //and has a header specifying the columns labels
+    *   table = loadTable("assets/mammals.csv", "csv", "header");
+    * }
+    *
+    * function setup() {
+    *   table.removeColumn("id");
+    *   print(table.getColumnCount());
+    * }
+    * </code>
+    * </div>
+    *
+    *@alt
+    * no image displayed
+    *
  */
 p5.Table.prototype.removeColumn = function(c) {
   var cString;
@@ -22204,39 +22165,39 @@ p5.Table.prototype.removeColumn = function(c) {
  * @param {String|Number} value  value to assign
  *
  * @example
-	* <div class="norender">
-	* <code>
-	* // Given the CSV file "mammals.csv"
-	* // in the project's "assets" folder:
-	* //
-	* // id,species,name
-	* // 0,Capra hircus,Goat
-	* // 1,Panthera pardus,Leopard
-	* // 2,Equus zebra,Zebra
-	*
-	* var table;
-	*
-	* function preload() {
-	*   //my table is comma separated value "csv"
-	*   //and has a header specifying the columns labels
-	*   table = loadTable("assets/mammals.csv", "csv", "header");
-	* }
-	*
-	* function setup() {
-	*   table.set(0, "species", "Canis Lupus");
-	*   table.set(0, "name", "Wolf");
-	*
-	*   //print the results
-	*   for (var r = 0; r < table.getRowCount(); r++)
-	*     for (var c = 0; c < table.getColumnCount(); c++)
-	*       print(table.getString(r, c));
-	* }
-	* </code>
-	* </div>
-	*
- 	*@alt
- 	* no image displayed
- 	*
+    * <div class="norender">
+    * <code>
+    * // Given the CSV file "mammals.csv"
+    * // in the project's "assets" folder:
+    * //
+    * // id,species,name
+    * // 0,Capra hircus,Goat
+    * // 1,Panthera pardus,Leopard
+    * // 2,Equus zebra,Zebra
+    *
+    * var table;
+    *
+    * function preload() {
+    *   //my table is comma separated value "csv"
+    *   //and has a header specifying the columns labels
+    *   table = loadTable("assets/mammals.csv", "csv", "header");
+    * }
+    *
+    * function setup() {
+    *   table.set(0, "species", "Canis Lupus");
+    *   table.set(0, "name", "Wolf");
+    *
+    *   //print the results
+    *   for (var r = 0; r < table.getRowCount(); r++)
+    *     for (var c = 0; c < table.getColumnCount(); c++)
+    *       print(table.getString(r, c));
+    * }
+    * </code>
+    * </div>
+    *
+    *@alt
+    * no image displayed
+    *
  */
 p5.Table.prototype.set = function(row, column, value) {
   this.rows[row].set(column, value);
@@ -22254,35 +22215,35 @@ p5.Table.prototype.set = function(row, column, value) {
  * @param {Number} value  value to assign
  *
  * @example
-	* <div class="norender">
-	* <code>
-	* // Given the CSV file "mammals.csv"
-	* // in the project's "assets" folder:
-	* //
-	* // id,species,name
-	* // 0,Capra hircus,Goat
-	* // 1,Panthera pardus,Leopard
-	* // 2,Equus zebra,Zebra
-	*
-	* var table;
-	*
-	* function preload() {
-	*   //my table is comma separated value "csv"
-	*   //and has a header specifying the columns labels
-	*   table = loadTable("assets/mammals.csv", "csv", "header");
-	* }
-	*
-	* function setup() {
-	*   table.setNum(1, "id", 1);
-	*
-	*   print(table.getColumn(0));
-	*   //["0", 1, "2"]
-	* }
-	* </code>
-	* </div>
-	*
- 	*@alt
- 	* no image displayed
+    * <div class="norender">
+    * <code>
+    * // Given the CSV file "mammals.csv"
+    * // in the project's "assets" folder:
+    * //
+    * // id,species,name
+    * // 0,Capra hircus,Goat
+    * // 1,Panthera pardus,Leopard
+    * // 2,Equus zebra,Zebra
+    *
+    * var table;
+    *
+    * function preload() {
+    *   //my table is comma separated value "csv"
+    *   //and has a header specifying the columns labels
+    *   table = loadTable("assets/mammals.csv", "csv", "header");
+    * }
+    *
+    * function setup() {
+    *   table.setNum(1, "id", 1);
+    *
+    *   print(table.getColumn(0));
+    *   //["0", 1, "2"]
+    * }
+    * </code>
+    * </div>
+    *
+    *@alt
+    * no image displayed
  */
 p5.Table.prototype.setNum = function(row, column, value){
   this.rows[row].setNum(column, value);
@@ -22316,36 +22277,36 @@ p5.Table.prototype.setString = function(row, column, value){
  * @return {String|Number}
  *
  * @example
-	* <div class="norender">
-	* <code>
-	* // Given the CSV file "mammals.csv"
-	* // in the project's "assets" folder:
-	* //
-	* // id,species,name
-	* // 0,Capra hircus,Goat
-	* // 1,Panthera pardus,Leopard
-	* // 2,Equus zebra,Zebra
-	*
-	* var table;
-	*
-	* function preload() {
-	*   //my table is comma separated value "csv"
-	*   //and has a header specifying the columns labels
-	*   table = loadTable("assets/mammals.csv", "csv", "header");
-	* }
-	*
-	* function setup() {
-	*   print(table.get(0, 1));
-	*   //Capra hircus
-	*   print(table.get(0, "species"));
-	*   //Capra hircus
-	* }
-	* </code>
-	* </div>
-	*
- 	*@alt
- 	* no image displayed
- 	*
+    * <div class="norender">
+    * <code>
+    * // Given the CSV file "mammals.csv"
+    * // in the project's "assets" folder:
+    * //
+    * // id,species,name
+    * // 0,Capra hircus,Goat
+    * // 1,Panthera pardus,Leopard
+    * // 2,Equus zebra,Zebra
+    *
+    * var table;
+    *
+    * function preload() {
+    *   //my table is comma separated value "csv"
+    *   //and has a header specifying the columns labels
+    *   table = loadTable("assets/mammals.csv", "csv", "header");
+    * }
+    *
+    * function setup() {
+    *   print(table.get(0, 1));
+    *   //Capra hircus
+    *   print(table.get(0, "species"));
+    *   //Capra hircus
+    * }
+    * </code>
+    * </div>
+    *
+    *@alt
+    * no image displayed
+    *
  */
 p5.Table.prototype.get = function(row, column) {
   return this.rows[row].get(column);
@@ -22363,34 +22324,34 @@ p5.Table.prototype.get = function(row, column) {
  * @return {Number}
  *
  * @example
-	* <div class="norender">
-	* <code>
-	* // Given the CSV file "mammals.csv"
-	* // in the project's "assets" folder:
-	* //
-	* // id,species,name
-	* // 0,Capra hircus,Goat
-	* // 1,Panthera pardus,Leopard
-	* // 2,Equus zebra,Zebra
-	*
-	* var table;
-	*
-	* function preload() {
-	*   //my table is comma separated value "csv"
-	*   //and has a header specifying the columns labels
-	*   table = loadTable("assets/mammals.csv", "csv", "header");
-	* }
-	*
-	* function setup() {
-	*   print(table.getNum(1, 0) + 100);
-	*   //id 1 + 100 = 101
-	* }
-	* </code>
-	* </div>
-	*
- 	*@alt
- 	* no image displayed
- 	*
+    * <div class="norender">
+    * <code>
+    * // Given the CSV file "mammals.csv"
+    * // in the project's "assets" folder:
+    * //
+    * // id,species,name
+    * // 0,Capra hircus,Goat
+    * // 1,Panthera pardus,Leopard
+    * // 2,Equus zebra,Zebra
+    *
+    * var table;
+    *
+    * function preload() {
+    *   //my table is comma separated value "csv"
+    *   //and has a header specifying the columns labels
+    *   table = loadTable("assets/mammals.csv", "csv", "header");
+    * }
+    *
+    * function setup() {
+    *   print(table.getNum(1, 0) + 100);
+    *   //id 1 + 100 = 101
+    * }
+    * </code>
+    * </div>
+    *
+    *@alt
+    * no image displayed
+    *
  */
 p5.Table.prototype.getNum = function(row, column) {
   return this.rows[row].getNum(column);
@@ -22408,37 +22369,37 @@ p5.Table.prototype.getNum = function(row, column) {
  * @return {String}
  *
  * @example
-	* <div class="norender">
-	* <code>
-	* // Given the CSV file "mammals.csv"
-	* // in the project's "assets" folder:
-	* //
-	* // id,species,name
-	* // 0,Capra hircus,Goat
-	* // 1,Panthera pardus,Leopard
-	* // 2,Equus zebra,Zebra
-	*
-	* var table;
-	*
-	* function preload() {
-	*   //my table is comma separated value "csv"
-	*   //and has a header specifying the columns labels
-	*   table = loadTable("assets/mammals.csv", "csv", "header");
-	* }
-	*
-	* function setup() {
-	*   var tableArray = table.getArray();
-	*
-	*   //output each row as array
-	*   for (var i = 0; i < tableArray.length; i++)
-	*     print(tableArray[i]);
-	* }
-	* </code>
-	* </div>
-	*
- 	*@alt
- 	* no image displayed
- 	*
+    * <div class="norender">
+    * <code>
+    * // Given the CSV file "mammals.csv"
+    * // in the project's "assets" folder:
+    * //
+    * // id,species,name
+    * // 0,Capra hircus,Goat
+    * // 1,Panthera pardus,Leopard
+    * // 2,Equus zebra,Zebra
+    *
+    * var table;
+    *
+    * function preload() {
+    *   //my table is comma separated value "csv"
+    *   //and has a header specifying the columns labels
+    *   table = loadTable("assets/mammals.csv", "csv", "header");
+    * }
+    *
+    * function setup() {
+    *   var tableArray = table.getArray();
+    *
+    *   //output each row as array
+    *   for (var i = 0; i < tableArray.length; i++)
+    *     print(tableArray[i]);
+    * }
+    * </code>
+    * </div>
+    *
+    *@alt
+    * no image displayed
+    *
  */
 p5.Table.prototype.getString = function(row, column) {
   return this.rows[row].getString(column);
@@ -22455,36 +22416,36 @@ p5.Table.prototype.getString = function(row, column) {
  * @return {Object}
  *
  * @example
-	* <div class="norender">
-	* <code>
-	* // Given the CSV file "mammals.csv"
-	* // in the project's "assets" folder:
-	* //
-	* // id,species,name
-	* // 0,Capra hircus,Goat
-	* // 1,Panthera pardus,Leopard
-	* // 2,Equus zebra,Zebra
-	*
-	* var table;
-	*
-	* function preload() {
-	*   //my table is comma separated value "csv"
-	*   //and has a header specifying the columns labels
-	*   table = loadTable("assets/mammals.csv", "csv", "header");
-	* }
-	*
-	* function setup() {
-	*   var tableObject = table.getObject();
-	*
-	*   print(tableObject);
-	*   //outputs an object
-	* }
-	* </code>
-	* </div>
-	*
- 	*@alt
- 	* no image displayed
- 	*
+    * <div class="norender">
+    * <code>
+    * // Given the CSV file "mammals.csv"
+    * // in the project's "assets" folder:
+    * //
+    * // id,species,name
+    * // 0,Capra hircus,Goat
+    * // 1,Panthera pardus,Leopard
+    * // 2,Equus zebra,Zebra
+    *
+    * var table;
+    *
+    * function preload() {
+    *   //my table is comma separated value "csv"
+    *   //and has a header specifying the columns labels
+    *   table = loadTable("assets/mammals.csv", "csv", "header");
+    * }
+    *
+    * function setup() {
+    *   var tableObject = table.getObject();
+    *
+    *   print(tableObject);
+    *   //outputs an object
+    * }
+    * </code>
+    * </div>
+    *
+    *@alt
+    * no image displayed
+    *
  */
 p5.Table.prototype.getObject = function (headerColumn) {
   var tableObject = {};
@@ -26810,7 +26771,7 @@ p5.Font.prototype.textBounds = function(str, x, y, fontSize, options) {
 
         var gm = glyph.getMetrics();
 
-        if (glyph.name !== 'space' && glyph.unicode !== 32) {
+        if (glyph.name !== 'space') {
 
           xCoords.push(gX + (gm.xMax * scale));
           yCoords.push(gY + (-gm.yMin * scale));
@@ -29157,10 +29118,6 @@ p5.prototype.camera = function(x, y, z){
  *
  */
 p5.prototype.perspective = function(fovy,aspect,near,far) {
-  fovy = fovy || (60 / 180 * this.PI);
-  aspect = aspect || (this.width/this.height);
-  near = near || ((this.height/2.0) / this.tan(fovy/2.0) * 0.1);
-  far = far || ((this.height/2.0) / this.tan(fovy/2.0) * 10);
   this._renderer.uPMatrix = p5.Matrix.identity();
   this._renderer.uPMatrix.perspective(fovy,aspect,near,far);
   this._renderer._curCamera = 'custom';
@@ -31780,4 +31737,846 @@ p5.RendererGL.prototype.rotateZ = function(rad) {
  * MV Matrix stack.
  */
 p5.RendererGL.prototype.push = function() {
-  uMVMatrixStack.push(this.uMVMatrix.copy                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+  uMVMatrixStack.push(this.uMVMatrix.copy());
+};
+
+/**
+ * [pop description]
+ * @return {[type]} [description]
+ */
+p5.RendererGL.prototype.pop = function() {
+  if (uMVMatrixStack.length === 0) {
+    throw new Error('Invalid popMatrix!');
+  }
+  this.uMVMatrix = uMVMatrixStack.pop();
+};
+
+p5.RendererGL.prototype.resetMatrix = function() {
+  this.uMVMatrix = p5.Matrix.identity();
+  this.translate(0, 0, -800);
+  return this;
+};
+
+// Text/Typography
+// @TODO:
+p5.RendererGL.prototype._applyTextProperties = function() {
+  //@TODO finish implementation
+  console.error('text commands not yet implemented in webgl');
+};
+module.exports = p5.RendererGL;
+
+},{"../core/core":37,"../core/p5.Renderer":43,"./p5.Matrix":83,"./shader":88}],87:[function(_dereq_,module,exports){
+/**
+ * @module Shape
+ * @submodule 3D Primitives
+ * @for p5
+ * @requires core
+ * @requires p5.Geometry
+ */
+
+'use strict';
+
+var p5 = _dereq_('../core/core');
+_dereq_('./p5.Geometry');
+/**
+ * Draw a plane with given a width and height
+ * @method plane
+ * @param  {Number} width      width of the plane
+ * @param  {Number} height     height of the plane
+ * @param  {Number} [detailX]  Optional number of triangle
+ *                             subdivisions in x-dimension
+ * @param {Number} [detailY]   Optional number of triangle
+ *                             subdivisions in y-dimension
+ * @return {p5}                the p5 object
+ * @example
+ * <div>
+ * <code>
+ * //draw a plane with width 200 and height 200
+ * function setup(){
+ *   createCanvas(100, 100, WEBGL);
+ * }
+ *
+ * function draw(){
+ *   background(200);
+ *   plane(50, 50);
+ * }
+ * </code>
+ * </div>
+ *
+ * @alt
+ * Nothing displayed on canvas
+ * Rotating interior view of a box with sides that change color.
+ * 3d red and green gradient.
+ * Rotating interior view of a cylinder with sides that change color.
+ * Rotating view of a cylinder with sides that change color.
+ * 3d red and green gradient.
+ * rotating view of a multi-colored cylinder with concave sides.
+ */
+p5.prototype.plane = function(){
+  var args = new Array(arguments.length);
+  for (var i = 0; i < args.length; ++i) {
+    args[i] = arguments[i];
+  }
+  var width = args[0] || 50;
+  var height = args[1] || width;
+  var detailX = typeof args[2] === 'number' ? args[2] : 1;
+  var detailY = typeof args[3] === 'number' ? args[3] : 1;
+
+  var gId = 'plane|'+width+'|'+height+'|'+detailX+'|'+detailY;
+
+  if(!this._renderer.geometryInHash(gId)){
+    var _plane = function(){
+      var u,v,p;
+      for (var i = 0; i <= this.detailY; i++){
+        v = i / this.detailY;
+        for (var j = 0; j <= this.detailX; j++){
+          u = j / this.detailX;
+          p = new p5.Vector(width * u - width/2,
+            height * v - height/2,
+            0);
+          this.vertices.push(p);
+          this.uvs.push([u,v]);
+        }
+      }
+    };
+    var planeGeom =
+    new p5.Geometry(detailX, detailY, _plane);
+    planeGeom
+      .computeFaces()
+      .computeNormals();
+    this._renderer.createBuffers(gId, planeGeom);
+  }
+
+  this._renderer.drawBuffers(gId);
+
+};
+
+/**
+ * Draw a box with given width, height and depth
+ * @method  box
+ * @param  {Number} width     width of the box
+ * @param  {Number} Height    height of the box
+ * @param  {Number} depth     depth of the box
+ * @param {Number} [detailX]  Optional number of triangle
+ *                            subdivisions in x-dimension
+ * @param {Number} [detailY]  Optional number of triangle
+ *                            subdivisions in y-dimension
+ * @return {p5}               the p5 object
+ * @example
+ * <div>
+ * <code>
+ * //draw a spinning box with width, height and depth 200
+ * function setup(){
+ *   createCanvas(100, 100, WEBGL);
+ * }
+ *
+ * function draw(){
+ *   background(200);
+ *   rotateX(frameCount * 0.01);
+ *   rotateY(frameCount * 0.01);
+ *   box(200, 200, 200);
+ * }
+ * </code>
+ * </div>
+ */
+p5.prototype.box = function(){
+  var args = new Array(arguments.length);
+  for (var i = 0; i < args.length; ++i) {
+    args[i] = arguments[i];
+  }
+  var width = args[0] || 50;
+  var height = args[1] || width;
+  var depth = args[2] || width;
+
+  var detailX = typeof args[3] === 'number' ? args[3] : 4;
+  var detailY = typeof args[4] === 'number' ? args[4] : 4;
+  var gId = 'box|'+width+'|'+height+'|'+depth+'|'+detailX+'|'+detailY;
+
+  if(!this._renderer.geometryInHash(gId)){
+    var _box = function(){
+      var cubeIndices = [
+        [0, 4, 2, 6],// -1, 0, 0],// -x
+        [1, 3, 5, 7],// +1, 0, 0],// +x
+        [0, 1, 4, 5],// 0, -1, 0],// -y
+        [2, 6, 3, 7],// 0, +1, 0],// +y
+        [0, 2, 1, 3],// 0, 0, -1],// -z
+        [4, 5, 6, 7]// 0, 0, +1] // +z
+      ];
+      var id=0;
+      for (var i = 0; i < cubeIndices.length; i++) {
+        var cubeIndex = cubeIndices[i];
+        var v = i * 4;
+        for (var j = 0; j < 4; j++) {
+          var d = cubeIndex[j];
+          //inspired by lightgl:
+          //https://github.com/evanw/lightgl.js
+          //octants:https://en.wikipedia.org/wiki/Octant_(solid_geometry)
+          var octant = new p5.Vector(
+            ((d & 1) * 2 - 1)*width/2,
+            ((d & 2) - 1) *height/2,
+            ((d & 4) / 2 - 1) * depth/2);
+          this.vertices.push( octant );
+          this.uvs.push([j & 1, (j & 2) / 2]);
+          id++;
+        }
+        this.faces.push([v, v + 1, v + 2]);
+        this.faces.push([v + 2, v + 1, v + 3]);
+      }
+    };
+    var boxGeom = new p5.Geometry(detailX,detailY, _box);
+    boxGeom.computeNormals();
+    //initialize our geometry buffer with
+    //the key val pair:
+    //geometry Id, Geom object
+    this._renderer.createBuffers(gId, boxGeom);
+  }
+  this._renderer.drawBuffers(gId);
+
+  return this;
+
+};
+
+/**
+ * Draw a sphere with given radius
+ * @method sphere
+ * @param  {Number} radius            radius of circle
+ * @param  {Number} [detailX]         optional: number of segments,
+ *                                    the more segments the smoother geometry
+ *                                    default is 24
+ * @param  {Number} [detailY]         optional: number of segments,
+ *                                    the more segments the smoother geometry
+ *                                    default is 16
+ * @return {p5}                       the p5 object
+ * @example
+ * <div>
+ * <code>
+ * // draw a sphere with radius 200
+ * function setup(){
+ *   createCanvas(100, 100, WEBGL);
+ * }
+ *
+ * function draw(){
+ *   background(200);
+ *   sphere(50);
+ * }
+ * </code>
+ * </div>
+ */
+p5.prototype.sphere = function(){
+  var args = new Array(arguments.length);
+  for (var i = 0; i < args.length; ++i) {
+    args[i] = arguments[i];
+  }
+  var radius = args[0] || 50;
+  var detailX = typeof args[1] === 'number' ? args[1] : 24;
+  var detailY = typeof args[2] === 'number' ? args[2] : 16;
+  var gId = 'sphere|'+radius+'|'+detailX+'|'+detailY;
+  if(!this._renderer.geometryInHash(gId)){
+    var _sphere = function(){
+      var u,v,p;
+      for (var i = 0; i <= this.detailY; i++){
+        v = i / this.detailY;
+        for (var j = 0; j <= this.detailX; j++){
+          u = j / this.detailX;
+          var theta = 2 * Math.PI * u;
+          var phi = Math.PI * v - Math.PI / 2;
+          p = new p5.Vector(radius * Math.cos(phi) * Math.sin(theta),
+            radius * Math.sin(phi),
+            radius * Math.cos(phi) * Math.cos(theta));
+          this.vertices.push(p);
+          this.uvs.push([u,v]);
+        }
+      }
+    };
+    var sphereGeom = new p5.Geometry(detailX, detailY, _sphere);
+    sphereGeom
+      .computeFaces()
+      .computeNormals()
+      .averageNormals()
+      .averagePoleNormals();
+    this._renderer.createBuffers(gId, sphereGeom);
+  }
+  this._renderer.drawBuffers(gId);
+
+  return this;
+};
+
+
+/**
+* @private
+* helper function for creating both cones and cyllinders
+*/
+var _truncatedCone = function(
+  bottomRadius,
+  topRadius,
+  height,
+  detailX,
+  detailY,
+  topCap,
+  bottomCap) {
+  detailX = (detailX < 3) ? 3 : detailX;
+  detailY = (detailY < 1) ? 1 : detailY;
+  topCap = (topCap === undefined) ? true : topCap;
+  bottomCap = (bottomCap === undefined) ? true : bottomCap;
+  var extra = (topCap ? 2 : 0) + (bottomCap ? 2 : 0);
+  var vertsAroundEdge = detailX + 1;
+
+  // ensure constant slant
+  var slant = Math.atan2(bottomRadius - topRadius, height);
+  var start = topCap ? -2 : 0;
+  var end = detailY + (bottomCap ? 2 : 0);
+  var yy, ii;
+  for (yy = start; yy <= end; ++yy) {
+    var v = yy / detailY;
+    var y = height * v;
+    var ringRadius;
+    if (yy < 0) {
+      y = 0;
+      v = 1;
+      ringRadius = bottomRadius;
+    } else if (yy > detailY) {
+      y = height;
+      v = 1;
+      ringRadius = topRadius;
+    } else {
+      ringRadius = bottomRadius +
+        (topRadius - bottomRadius) * (yy / detailY);
+    }
+    if (yy === -2 || yy === detailY + 2) {
+      ringRadius = 0;
+      v = 0;
+    }
+    y -= height / 2;
+    for (ii = 0; ii < vertsAroundEdge; ++ii) {
+      //VERTICES
+      this.vertices.push(
+        new p5.Vector(
+          Math.sin(ii*Math.PI * 2 /detailX) * ringRadius,
+          y,
+          Math.cos(ii*Math.PI * 2 /detailX) * ringRadius)
+        );
+      //VERTEX NORMALS
+      this.vertexNormals.push(
+        new p5.Vector(
+          (yy < 0 || yy > detailY) ? 0 :
+          (Math.sin(ii * Math.PI * 2 / detailX) * Math.cos(slant)),
+          (yy < 0) ? -1 : (yy > detailY ? 1 : Math.sin(slant)),
+          (yy < 0 || yy > detailY) ? 0 :
+          (Math.cos(ii * Math.PI * 2 / detailX) * Math.cos(slant)))
+        );
+      //UVs
+      this.uvs.push([(ii / detailX), v]);
+    }
+  }
+  for (yy = 0; yy < detailY + extra; ++yy) {
+    for (ii = 0; ii < detailX; ++ii) {
+      this.faces.push([vertsAroundEdge * (yy + 0) + 0 + ii,
+        vertsAroundEdge * (yy + 0) + 1 + ii,
+        vertsAroundEdge * (yy + 1) + 1 + ii]);
+      this.faces.push([vertsAroundEdge * (yy + 0) + 0 + ii,
+        vertsAroundEdge * (yy + 1) + 1 + ii,
+        vertsAroundEdge * (yy + 1) + 0 + ii]);
+    }
+  }
+};
+
+/**
+ * Draw a cylinder with given radius and height
+ * @method  cylinder
+ * @param  {Number} radius     radius of the surface
+ * @param  {Number} height     height of the cylinder
+ * @param  {Number} [detailX]  optional: number of segments,
+ *                             the more segments the smoother geometry
+ *                             default is 24
+ * @param {Number} [detailY]   optional: number of segments in y-dimension,
+ *                             the more segments the smoother geometry
+ *                             default is 16
+ * @return {p5}                the p5 object
+ * @example
+ * <div>
+ * <code>
+ * //draw a spinning cylinder with radius 200 and height 200
+ * function setup(){
+ *   createCanvas(100, 100, WEBGL);
+ * }
+ *
+ * function draw(){
+ *   background(200);
+ *   rotateX(frameCount * 0.01);
+ *   rotateZ(frameCount * 0.01);
+ *   cylinder(200, 200);
+ * }
+ * </code>
+ * </div>
+ */
+p5.prototype.cylinder = function(){
+  var args = new Array(arguments.length);
+  for (var i = 0; i < args.length; ++i) {
+    args[i] = arguments[i];
+  }
+  var radius = args[0] || 50;
+  var height = args[1] || radius;
+  var detailX = typeof args[2] === 'number' ? args[2] : 24;
+  var detailY = typeof args[3] === 'number' ? args[3] : 16;
+  var gId = 'cylinder|'+radius+'|'+height+'|'+detailX+'|'+detailY;
+  if(!this._renderer.geometryInHash(gId)){
+    var cylinderGeom = new p5.Geometry(detailX, detailY);
+    _truncatedCone.call(
+      cylinderGeom,
+      radius,
+      radius,
+      height,
+      detailX,
+      detailY,
+      true,true);
+    cylinderGeom.computeNormals();
+    this._renderer.createBuffers(gId, cylinderGeom);
+  }
+
+  this._renderer.drawBuffers(gId);
+
+  return this;
+};
+
+
+/**
+ * Draw a cone with given radius and height
+ * @method cone
+ * @param  {Number} radius            radius of the bottom surface
+ * @param  {Number} height            height of the cone
+ * @param  {Number} [detailX]         optional: number of segments,
+ *                                    the more segments the smoother geometry
+ *                                    default is 24
+ * @param  {Number} [detailY]         optional: number of segments,
+ *                                    the more segments the smoother geometry
+ *                                    default is 16
+ * @return {p5}                       the p5 object
+ * @example
+ * <div>
+ * <code>
+ * //draw a spinning cone with radius 200 and height 200
+ * function setup(){
+ *   createCanvas(100, 100, WEBGL);
+ * }
+ *
+ * function draw(){
+ *   background(200);
+ *   rotateX(frameCount * 0.01);
+ *   rotateZ(frameCount * 0.01);
+ *   cone(200, 200);
+ * }
+ * </code>
+ * </div>
+ */
+p5.prototype.cone = function(){
+  var args = new Array(arguments.length);
+  for (var i = 0; i < args.length; ++i) {
+    args[i] = arguments[i];
+  }
+  var baseRadius = args[0] || 50;
+  var height = args[1] || baseRadius;
+  var detailX = typeof args[2] === 'number' ? args[2] : 24;
+  var detailY = typeof args[3] === 'number' ? args[3] : 16;
+  var gId = 'cone|'+baseRadius+'|'+height+'|'+detailX+'|'+detailY;
+  if(!this._renderer.geometryInHash(gId)){
+    var coneGeom = new p5.Geometry(detailX, detailY);
+    _truncatedCone.call(coneGeom,
+      baseRadius,
+      0,//top radius 0
+      height,
+      detailX,
+      detailY,
+      true,
+      true);
+    //for cones we need to average Normals
+    coneGeom
+      .computeNormals();
+    this._renderer.createBuffers(gId, coneGeom);
+  }
+
+  this._renderer.drawBuffers(gId);
+
+  return this;
+};
+
+/**
+ * Draw an ellipsoid with given radius
+ * @method ellipsoid
+ * @param  {Number} radiusx           xradius of circle
+ * @param  {Number} radiusy           yradius of circle
+ * @param  {Number} radiusz           zradius of circle
+ * @param  {Number} [detailX]         optional: number of segments,
+ *                                    the more segments the smoother geometry
+ *                                    default is 24. Avoid detail number above
+ *                                    150, it may crash the browser.
+ * @param  {Number} [detailY]         optional: number of segments,
+ *                                    the more segments the smoother geometry
+ *                                    default is 16. Avoid detail number above
+ *                                    150, it may crash the browser.
+ * @return {p5}                       the p5 object
+ * @example
+ * <div>
+ * <code>
+ * // draw an ellipsoid with radius 20, 30 and 40.
+ * function setup(){
+ *   createCanvas(100, 100, WEBGL);
+ * }
+ *
+ * function draw(){
+ *   background(200);
+ *   ellipsoid(20, 30, 40);
+ * }
+ * </code>
+ * </div>
+ */
+p5.prototype.ellipsoid = function(){
+  var args = new Array(arguments.length);
+  for (var i = 0; i < args.length; ++i) {
+    args[i] = arguments[i];
+  }
+  var detailX = typeof args[3] === 'number' ? args[3] : 24;
+  var detailY = typeof args[4] === 'number' ? args[4] : 24;
+  var radiusX = args[0] || 50;
+  var radiusY = args[1] || radiusX;
+  var radiusZ = args[2] || radiusX;
+
+  var gId = 'ellipsoid|'+radiusX+'|'+radiusY+
+  '|'+radiusZ+'|'+detailX+'|'+detailY;
+
+
+  if(!this._renderer.geometryInHash(gId)){
+    var _ellipsoid = function(){
+      var u,v,p;
+      for (var i = 0; i <= this.detailY; i++){
+        v = i / this.detailY;
+        for (var j = 0; j <= this.detailX; j++){
+          u = j / this.detailX;
+          var theta = 2 * Math.PI * u;
+          var phi = Math.PI * v - Math.PI / 2;
+          p = new p5.Vector(radiusX * Math.cos(phi) * Math.sin(theta),
+            radiusY * Math.sin(phi),
+            radiusZ * Math.cos(phi) * Math.cos(theta));
+          this.vertices.push(p);
+          this.uvs.push([u,v]);
+        }
+      }
+    };
+    var ellipsoidGeom = new p5.Geometry(detailX, detailY,_ellipsoid);
+    ellipsoidGeom
+      .computeFaces()
+      .computeNormals();
+    this._renderer.createBuffers(gId, ellipsoidGeom);
+  }
+
+  this._renderer.drawBuffers(gId);
+
+  return this;
+};
+
+/**
+ * Draw a torus with given radius and tube radius
+ * @method torus
+ * @param  {Number} radius        radius of the whole ring
+ * @param  {Number} tubeRadius    radius of the tube
+ * @param  {Number} [detailX]     optional: number of segments in x-dimension,
+ *                                the more segments the smoother geometry
+ *                                default is 24
+ * @param  {Number} [detailY]     optional: number of segments in y-dimension,
+ *                                the more segments the smoother geometry
+ *                                default is 16
+ * @return {p5}                   the p5 object
+ * @example
+ * <div>
+ * <code>
+ * //draw a spinning torus with radius 200 and tube radius 60
+ * function setup(){
+ *   createCanvas(100, 100, WEBGL);
+ * }
+ *
+ * function draw(){
+ *   background(200);
+ *   rotateX(frameCount * 0.01);
+ *   rotateY(frameCount * 0.01);
+ *   torus(200, 60);
+ * }
+ * </code>
+ * </div>
+ */
+p5.prototype.torus = function(){
+  var args = new Array(arguments.length);
+  for (var i = 0; i < args.length; ++i) {
+    args[i] = arguments[i];
+  }
+  var detailX = typeof args[2] === 'number' ? args[2] : 24;
+  var detailY = typeof args[3] === 'number' ? args[3] : 16;
+
+  var radius = args[0] || 50;
+  var tubeRadius = args[1] || 10;
+
+  var gId = 'torus|'+radius+'|'+tubeRadius+'|'+detailX+'|'+detailY;
+
+  if(!this._renderer.geometryInHash(gId)){
+    var _torus = function(){
+      var u,v,p;
+      for (var i = 0; i <= this.detailY; i++){
+        v = i / this.detailY;
+        for (var j = 0; j <= this.detailX; j++){
+          u = j / this.detailX;
+          var theta = 2 * Math.PI * u;
+          var phi = 2 * Math.PI * v;
+          p = new p5.Vector(
+            (radius + tubeRadius * Math.cos(phi)) * Math.cos(theta),
+            (radius + tubeRadius * Math.cos(phi)) * Math.sin(theta),
+            tubeRadius * Math.sin(phi));
+          this.vertices.push(p);
+          this.uvs.push([u,v]);
+        }
+      }
+    };
+    var torusGeom = new p5.Geometry(detailX, detailY, _torus);
+    torusGeom
+      .computeFaces()
+      .computeNormals()
+      .averageNormals();
+    this._renderer.createBuffers(gId, torusGeom);
+  }
+
+  this._renderer.drawBuffers(gId);
+
+  return this;
+};
+
+///////////////////////
+/// 2D primitives
+/////////////////////////
+
+//@TODO
+p5.RendererGL.prototype.point = function(x, y, z){
+  console.log('point not yet implemented in webgl');
+  return this;
+};
+
+p5.RendererGL.prototype.triangle = function
+(args){
+  var x1=args[0], y1=args[1];
+  var x2=args[2], y2=args[3];
+  var x3=args[4], y3=args[5];
+  var gId = 'tri|'+x1+'|'+y1+'|'+
+  x2+'|'+y2+'|'+
+  x3+'|'+y3;
+  if(!this.geometryInHash(gId)){
+    var _triangle = function(){
+      var vertices = [];
+      vertices.push(new p5.Vector(x1,y1,0));
+      vertices.push(new p5.Vector(x2,y2,0));
+      vertices.push(new p5.Vector(x3,y3,0));
+      this.vertices = vertices;
+      this.faces = [[0,1,2]];
+      this.uvs = [[0,0],[0,1],[1,1]];
+    };
+    var triGeom = new p5.Geometry(1,1,_triangle);
+    triGeom.computeNormals();
+    this.createBuffers(gId, triGeom);
+  }
+
+  this.drawBuffers(gId);
+  return this;
+};
+
+p5.RendererGL.prototype.ellipse = function
+(args){
+  var x = args[0];
+  var y = args[1];
+  var width = args[2];
+  var height = args[3];
+  //detailX and Y are optional 6th & 7th
+  //arguments
+  var detailX = args[4] || 24;
+  var detailY = args[5] || 16;
+  var gId = 'ellipse|'+args[0]+'|'+args[1]+'|'+args[2]+'|'+
+  args[3];
+  if(!this.geometryInHash(gId)){
+    var _ellipse = function(){
+      var u,v,p;
+      var centerX = x+width*0.5;
+      var centerY = y+height*0.5;
+      for (var i = 0; i <= this.detailY; i++){
+        v = i / this.detailY;
+        for (var j = 0; j <= this.detailX; j++){
+          u = j / this.detailX;
+          var theta = 2 * Math.PI * u;
+          if(v === 0){
+            p = new p5.Vector(centerX, centerY, 0);
+          }
+          else{
+            var _x = centerX + width*0.5 * Math.cos(theta);
+            var _y = centerY + height*0.5 * Math.sin(theta);
+            p = new p5.Vector(_x, _y, 0);
+          }
+          this.vertices.push(p);
+          this.uvs.push([u,v]);
+        }
+      }
+    };
+    var ellipseGeom = new p5.Geometry(detailX,detailY,_ellipse);
+    ellipseGeom
+      .computeFaces()
+      .computeNormals();
+    this.createBuffers(gId, ellipseGeom);
+  }
+  this.drawBuffers(gId);
+  return this;
+};
+
+p5.RendererGL.prototype.rect = function
+(args){
+  var gId = 'rect|'+args[0]+'|'+args[1]+'|'+args[2]+'|'+
+  args[3];
+  var x = args[0];
+  var y = args[1];
+  var width = args[2];
+  var height = args[3];
+  var detailX = args[4] || 24;
+  var detailY = args[5] || 16;
+  if(!this.geometryInHash(gId)){
+    var _rect = function(){
+      var u,v,p;
+      for (var i = 0; i <= this.detailY; i++){
+        v = i / this.detailY;
+        for (var j = 0; j <= this.detailX; j++){
+          u = j / this.detailX;
+          // var _x = x-width/2;
+          // var _y = y-height/2;
+          p = new p5.Vector(
+            x + (width*u),
+            y + (height*v),
+            0
+          );
+          this.vertices.push(p);
+          this.uvs.push([u,v]);
+        }
+      }
+    };
+    var rectGeom = new p5.Geometry(detailX,detailY,_rect);
+    rectGeom
+      .computeFaces()
+      .computeNormals();
+    this.createBuffers(gId, rectGeom);
+  }
+  this.drawBuffers(gId);
+  return this;
+};
+
+p5.RendererGL.prototype.quad = function(){
+  var args = new Array(arguments.length);
+  for (var i = 0; i < args.length; ++i) {
+    args[i] = arguments[i];
+  }
+  var x1 = args[0],
+    y1 = args[1],
+    x2 = args[2],
+    y2 = args[3],
+    x3 = args[4],
+    y3 = args[5],
+    x4 = args[6],
+    y4 = args[7];
+  var gId = 'quad|'+x1+'|'+y1+'|'+
+  x2+'|'+y2+'|'+
+  x3+'|'+y3+'|'+
+  x4+'|'+y4;
+  if(!this.geometryInHash(gId)){
+    var _quad = function(){
+      this.vertices.push(new p5.Vector(x1,y1,0));
+      this.vertices.push(new p5.Vector(x2,y2,0));
+      this.vertices.push(new p5.Vector(x3,y3,0));
+      this.vertices.push(new p5.Vector(x4,y4,0));
+      this.uvs.push([0, 0], [1, 0], [1, 1], [0, 1]);
+    };
+    var quadGeom = new p5.Geometry(2,2,_quad);
+    quadGeom.computeNormals();
+    quadGeom.faces = [[0,1,2],[2,3,0]];
+    this.createBuffers(gId, quadGeom);
+  }
+  this.drawBuffers(gId);
+  return this;
+};
+
+//this implementation of bezier curve
+//is based on Bernstein polynomial
+p5.RendererGL.prototype.bezier = function
+(args){
+  var bezierDetail=args[12] || 20;//value of Bezier detail
+  this.beginShape();
+  var coeff=[0,0,0,0];//  Bernstein polynomial coeffecients
+  var vertex=[0,0,0]; //(x,y,z) coordinates of points in bezier curve
+  for(var i=0; i<=bezierDetail; i++){
+    coeff[0]=Math.pow(1-(i/bezierDetail),3);
+    coeff[1]=(3*(i/bezierDetail)) * (Math.pow(1-(i/bezierDetail),2));
+    coeff[2]=(3*Math.pow(i/bezierDetail,2)) * (1-(i/bezierDetail));
+    coeff[3]=Math.pow(i/bezierDetail,3);
+    vertex[0]=args[0]*coeff[0] + args[3]*coeff[1] +
+              args[6]*coeff[2] + args[9]*coeff[3];
+    vertex[1]=args[1]*coeff[0] + args[4]*coeff[1] +
+              args[7]*coeff[2] + args[10]*coeff[3];
+    vertex[2]=args[2]*coeff[0] + args[5]*coeff[1] +
+              args[8]*coeff[2] + args[11]*coeff[3];
+    this.vertex(vertex[0],vertex[1],vertex[2]);
+  }
+  this.endShape();
+  return this;
+};
+
+p5.RendererGL.prototype.curve=function
+(args){
+  var curveDetail=args[12];
+  this.beginShape();
+  var coeff=[0,0,0,0];//coeffecients of the equation
+  var vertex=[0,0,0]; //(x,y,z) coordinates of points in bezier curve
+  for(var i=0; i<=curveDetail; i++){
+    coeff[0]=Math.pow((i/curveDetail),3) * 0.5;
+    coeff[1]=Math.pow((i/curveDetail),2) * 0.5;
+    coeff[2]=(i/curveDetail) * 0.5;
+    coeff[3]=0.5;
+    vertex[0]=coeff[0]*(-args[0] + (3*args[3]) - (3*args[6]) +args[9]) +
+              coeff[1]*((2*args[0]) - (5*args[3]) + (4*args[6]) - args[9]) +
+              coeff[2]*(-args[0] + args[6]) +
+              coeff[3]*(2*args[3]);
+    vertex[1]=coeff[0]*(-args[1] + (3*args[4]) - (3*args[7]) +args[10]) +
+              coeff[1]*((2*args[1]) - (5*args[4]) + (4*args[7]) - args[10]) +
+              coeff[2]*(-args[1] + args[7]) +
+              coeff[3]*(2*args[4]);
+    vertex[2]=coeff[0]*(-args[2] + (3*args[5]) - (3*args[8]) +args[11]) +
+              coeff[1]*((2*args[2]) - (5*args[5]) + (4*args[8]) - args[11]) +
+              coeff[2]*(-args[2] + args[8]) +
+              coeff[3]*(2*args[5]);
+    this.vertex(vertex[0],vertex[1],vertex[2]);
+  }
+  this.endShape();
+  return this;
+};
+
+module.exports = p5;
+
+},{"../core/core":37,"./p5.Geometry":82}],88:[function(_dereq_,module,exports){
+
+
+module.exports = {
+  immediateVert:
+    "attribute vec3 aPosition;\nattribute vec4 aVertexColor;\n\nuniform mat4 uModelViewMatrix;\nuniform mat4 uProjectionMatrix;\nuniform float uResolution;\nuniform float uPointSize;\n\nvarying vec4 vColor;\nvoid main(void) {\n  vec4 positionVec4 = vec4(aPosition * vec3(1.0, -1.0, 1.0), 1.0);\n  gl_Position = uProjectionMatrix * uModelViewMatrix * positionVec4;\n  vColor = aVertexColor;\n  gl_PointSize = uPointSize;\n}\n",
+  vertexColorVert:
+    "attribute vec3 aPosition;\nattribute vec4 aVertexColor;\n\nuniform mat4 uModelViewMatrix;\nuniform mat4 uProjectionMatrix;\n\nvarying vec4 vColor;\n\nvoid main(void) {\n  vec4 positionVec4 = vec4(aPosition * vec3(1.0, -1.0, 1.0), 1.0);\n  gl_Position = uProjectionMatrix * uModelViewMatrix * positionVec4;\n  vColor = aVertexColor;\n}\n",
+  vertexColorFrag:
+    "precision mediump float;\nvarying vec4 vColor;\nvoid main(void) {\n  gl_FragColor = vColor;\n}",
+  normalVert:
+    "attribute vec3 aPosition;\nattribute vec3 aNormal;\nattribute vec2 aTexCoord;\n\nuniform mat4 uModelViewMatrix;\nuniform mat4 uProjectionMatrix;\nuniform mat3 uNormalMatrix;\n\nvarying vec3 vVertexNormal;\nvarying highp vec2 vVertTexCoord;\n\nvoid main(void) {\n  vec4 positionVec4 = vec4(aPosition * vec3(1.0, -1.0, 1.0), 1.0);\n  gl_Position = uProjectionMatrix * uModelViewMatrix * positionVec4;\n  vVertexNormal = vec3( uNormalMatrix * aNormal );\n  vVertTexCoord = aTexCoord;\n}\n",
+  normalFrag:
+    "precision mediump float;\nvarying vec3 vVertexNormal;\nvoid main(void) {\n  gl_FragColor = vec4(vVertexNormal, 1.0);\n}",
+  basicFrag:
+    "precision mediump float;\nvarying vec3 vVertexNormal;\nuniform vec4 uMaterialColor;\nvoid main(void) {\n  gl_FragColor = uMaterialColor;\n}",
+  lightVert:
+    "attribute vec3 aPosition;\nattribute vec3 aNormal;\nattribute vec2 aTexCoord;\n\nuniform mat4 uModelViewMatrix;\nuniform mat4 uProjectionMatrix;\nuniform mat3 uNormalMatrix;\nuniform int uAmbientLightCount;\nuniform int uDirectionalLightCount;\nuniform int uPointLightCount;\n\nuniform vec3 uAmbientColor[8];\nuniform vec3 uLightingDirection[8];\nuniform vec3 uDirectionalColor[8];\nuniform vec3 uPointLightLocation[8];\nuniform vec3 uPointLightColor[8];\nuniform bool uSpecular;\n\nvarying vec3 vVertexNormal;\nvarying vec2 vVertTexCoord;\nvarying vec3 vLightWeighting;\n\nvec3 ambientLightFactor = vec3(0.0, 0.0, 0.0);\nvec3 directionalLightFactor = vec3(0.0, 0.0, 0.0);\nvec3 pointLightFactor = vec3(0.0, 0.0, 0.0);\nvec3 pointLightFactor2 = vec3(0.0, 0.0, 0.0);\n\nvoid main(void){\n\n  vec4 positionVec4 = vec4(aPosition, 1.0);\n  gl_Position = uProjectionMatrix * uModelViewMatrix * positionVec4;\n\n  vec3 vertexNormal = vec3( uNormalMatrix * aNormal );\n  vVertexNormal = vertexNormal;\n  vVertTexCoord = aTexCoord;\n\n  vec4 mvPosition = uModelViewMatrix * vec4(aPosition, 1.0);\n  vec3 eyeDirection = normalize(-mvPosition.xyz);\n\n  float shininess = 32.0;\n  float specularFactor = 2.0;\n  float diffuseFactor = 0.3;\n\n  for(int i = 0; i < 8; i++){\n    if(uAmbientLightCount == i) break;\n    ambientLightFactor += uAmbientColor[i];\n  }\n\n  for(int j = 0; j < 8; j++){\n    if(uDirectionalLightCount == j) break;\n    vec3 dir = uLightingDirection[j];\n    float directionalLightWeighting = max(dot(vertexNormal, dir), 0.0);\n    directionalLightFactor += uDirectionalColor[j] * directionalLightWeighting;\n  }\n\n  for(int k = 0; k < 8; k++){\n    if(uPointLightCount == k) break;\n    vec3 loc = uPointLightLocation[k];\n    vec3 lightDirection = normalize(loc - mvPosition.xyz);\n\n    float directionalLightWeighting = max(dot(vertexNormal, lightDirection), 0.0);\n    pointLightFactor += uPointLightColor[k] * directionalLightWeighting;\n\n    //factor2 for specular\n    vec3 reflectionDirection = reflect(-lightDirection, vertexNormal);\n    float specularLightWeighting = pow(max(dot(reflectionDirection, eyeDirection), 0.0), shininess);\n\n    pointLightFactor2 += uPointLightColor[k] * (specularFactor * specularLightWeighting\n      +  directionalLightWeighting * diffuseFactor);\n  }\n\n  if(!uSpecular){\n    vLightWeighting =  ambientLightFactor + directionalLightFactor + pointLightFactor;\n  }else{\n    vLightWeighting = ambientLightFactor + directionalLightFactor + pointLightFactor2;\n  }\n\n}\n",
+  lightTextureFrag:
+    "precision mediump float;\n\nuniform vec4 uMaterialColor;\nuniform sampler2D uSampler;\nuniform bool isTexture;\n\nvarying vec3 vLightWeighting;\nvarying highp vec2 vVertTexCoord;\n\nvoid main(void) {\n  if(!isTexture){\n    gl_FragColor = vec4(vec3(uMaterialColor.rgb * vLightWeighting), uMaterialColor.a);\n  }else{\n    vec4 textureColor = texture2D(uSampler, vVertTexCoord);\n    if(vLightWeighting == vec3(0., 0., 0.)){\n      gl_FragColor = textureColor;\n    }else{\n      gl_FragColor = vec4(vec3(textureColor.rgb * vLightWeighting), textureColor.a);\n    }\n  }\n}"
+};
+},{}]},{},[28])(28)
+});
