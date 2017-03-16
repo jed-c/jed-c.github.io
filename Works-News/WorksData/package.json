@@ -1,0 +1,15 @@
+{
+  "name": "moses1",
+  "version": "1.0.0",
+  "description": "firsties",
+  "main": "downloader.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "jed-c",
+  "license": "ISC",
+  "dependencies": {
+    "request": "^2.80.0",
+    "sync-request": "^4.0.1"
+  }
+}

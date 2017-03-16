@@ -1,0 +1,7 @@
+<div><h1> <font color="gray">The Works of Robert Moses in the News</font></h1></div>
+<hr>
+
+<table> 
+<tr ng-repeat="row in vm.data.jedsReducedData"> <td> <a ui-sref="detail({projectName:row.projectName})">{{row.projectName}}</a> </td></tr>
+</table>
+

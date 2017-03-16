@@ -1,0 +1,12 @@
+<div> <h2>  <font color="gray"> Project News Timeline, Related Articles </font></h2> </div>
+<hr>
+<div> <h3>{{vm.stateParams.projectName}}</h3> </div>
+<div> <bar-graph-directive bar-graph-data="vm.data.projects[vm.stateParams.projectName]"> </bar-graph-directive> </div>
+
+<table class="table">
+    <tr ng-repeat="row in vm.data.projects[vm.stateParams.projectName].articles|orderBy:'sortableTime'">
+        <td>{{row.parsedDate.format("YYYY-MM-DD")}} {{row.headline.main}} <a ng-href="{{row.web_url}}" target="_blank"> (link) </a> </td>
+    </tr>
+</table>
+<!-- <div> {{vm.data.projects[vm.stateParams.projectName]}} </div>
+ -->
