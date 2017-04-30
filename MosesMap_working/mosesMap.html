@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8' />
+    <title></title>
+    <script language="javascript" type="text/javascript" src="libraries/p5.js"></script>
+    <!-- uncomment lines below to include extra p5 libraries -->
+    <!--<script language="javascript" src="libraries/p5.dom.js"></script>-->
+    <!--<script language="javascript" src="libraries/p5.sound.js"></script>-->
+    <script language="javascript" type="text/javascript" src="sketch.js"></script>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.36.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.36.0/mapbox-gl.css' rel='stylesheet' />
+    <style>
+    body {
+        margin: 0;
+        padding: 0;
+    }
+    
+    #mosesMap {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+    }
+    </style>
+</head>
+
+<body>
+    <div id='mosesMap'></div>
+    <script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoiamVkLWMiLCJhIjoiY2oxamswaGJzMDFiZzJ3cGtwa2Yzdzd1dCJ9.kSiot5p9XP1V7nJ_y-fSig';
+
+    var bounds = [
+        [-74.645410, 40.336251],
+        [-72.179226, 41.123270]
+    ];
+
+
+    var mosesMap = new mapboxgl.Map({
+        container: 'mosesMap',
+        style: 'mapbox://styles/jed-c/cj252yyw1000p2snz5wr0ssib',
+        center: [-73.912505, 40.662370],
+        zoom: 9,
+        maxBounds: bounds
+    });
+    </script>
+</body>
+
+</html>
