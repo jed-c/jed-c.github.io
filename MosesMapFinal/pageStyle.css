@@ -1,0 +1,40 @@
+    body {
+        margin: 0px;
+        padding-bottom:10px;
+        font-family: 'Libre Franklin', sans-serif;
+    }
+
+    
+    #mosesMap {
+        position: absolute;
+        top: 125px;
+        bottom: 100px;
+        width: 69%;
+    }
+
+    #infoPanel {
+    	position: absolute;
+    	top: 125px;
+    	bottom: 0px;
+    	right:0px;
+    	width:31%;
+    }
+
+    .imageSize {
+    	width: 400px;
+    	height: 400px;
+    }
+
+    #timeline {
+    	position: absolute;
+    	bottom: 0px;
+    	height: 100px;
+    	left: 0px;
+    }
+
+    #legend {
+        position: absolute;
+        height: 25px;
+        width: 69%;
+    }
+
