@@ -1,0 +1,20 @@
+<div>
+    <h1 class="headline"><center>THE PROJECTS OF ROBERT MOSES</center></h1>
+    <H3 class="headlinetwo"><center>   MAP & TIMELINE</center> </H3>
+    <div id="legend">
+        <div ng-repeat="project in vm.projecttype">
+            <img ng-src="{{project.image}}" ng-click="vm.iclickedit(project.id)">
+        </div>
+        <div>
+            <img src="c17clear.gif" ng-click="vm.iclickedit()" height="30" width="30">
+        </div>
+    </div>
+</div>
+<map-directive> </map-directive>
+<div>
+    <div ui-view></div>
+</div>
+</div>
+<div id="timeline">
+    <timeline-directive timeline-data="vm.featuresArrayHolder.featuresArray"> </timeline-directive>
+</div>

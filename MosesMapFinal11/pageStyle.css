@@ -1,0 +1,68 @@
+    body {
+        margin-left: 10px;
+        background: #fbfbea;
+        padding-bottom: 10px;
+        /*        left: 35px;*/
+        /*        font-family: 'Libre Franklin', sans-serif;*/
+    }
+    /*    #bodycontainer {
+        position: absolute;
+        left: 35px;
+    }*/
+    
+    .headline {
+        font-family: 'Libre Franklin', sans-serif, font: bold;
+        line-height: 1;
+    }
+    
+    .headline2 {
+        font-family: 'Libre Franklin', sans-serif;
+    }
+    
+    #legend {
+        position: absolute;
+        /*                display: inline;
+                margin-left: 5px;
+*/
+        /*        float: left;*/
+        top: 125px;
+        bottom: 100px;
+        border-radius: 10px;
+        width: 69%;
+    }
+    
+    #mosesMap {
+        position: absolute;
+        border-radius: 10px;
+        top: 125px;
+        left: 45px;
+        bottom: 100px;
+        width: 65%;
+    }
+    
+    #infoPanel {
+        position: absolute;
+        border-radius: 10px;
+        top: 125px;
+        padding-left: 50px;
+        bottom: 0px;
+        right: 0px;
+        width: 35%;
+    }
+    
+    .imageSize {
+        border-radius: 10px;
+        top: 125px;
+        /*        padding-left: 50px;
+*/
+        right: 0px;
+        width: 400px;
+        height: 400px;
+    }
+    
+    #timeline {
+        position: absolute;
+        bottom: 0px;
+        height: 100px;
+        left: 30px;
+    }
